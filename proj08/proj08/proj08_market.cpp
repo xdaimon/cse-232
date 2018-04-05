@@ -88,6 +88,7 @@ Outputs
 */
 pair<double, double> Market::high_low_year(long year, string symbol) {
     // if database has data for symbol
+
     // the symbol's index in symbol_list is the same as the symbol's index in the price vectors
     auto price_index = find(symbol_list.begin(), symbol_list.end(), symbol) - symbol_list.begin();
     if (price_index == symbol_list.size()) {
@@ -95,6 +96,7 @@ pair<double, double> Market::high_low_year(long year, string symbol) {
     }
 
     // and if database has data for year
+
     // use binary search to find the exact range of dates to process
     auto first = stocks.lower_bound(year * 10000); // an iterator that points to the min x in stocks s.t. x.date >= year*10000
     auto end = stocks.lower_bound((year + 1) * 10000);
