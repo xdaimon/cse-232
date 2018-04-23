@@ -1,7 +1,7 @@
 /*
 Bradley Bauer
 Section 14
-04-12-18
+04-23-18
 Project 11
 
 This code implements a mapset by using a linked list and dynamic memory instead of STL vectors.
@@ -140,30 +140,32 @@ size_t MapSet<K, V>::size() const {
 }
 
 /*
-Find the position of the first node whose key is greater than or equal to (not less than) the input key
+Find the position of the first node with key greater than or equal to the input key
 Inputs:
     key: the key to find a position for
 Outputs:
-    prev_next: a pointer to node p and the node that precedes p in the linked list
+    a pointer to node p and a pointer to the node that precedes p
+    if mapset is empty then returns {nullptr, nullptr}
+    if sought node is at beginning then returns {nullptr, head_}
+    if sought node is not found then returns {tail, nullptr}
+    otherwise returns {prev, ptr}
 */
 template<typename K, typename V>
 pair<Node<K,V>*, Node<K,V>*> MapSet<K, V>::find_key(K key) {
-    // A pointer to node p and the node that precedes p in the linked list
-    pair<Node<K,V>*, Node<K,V>*> prev_next {nullptr, head_};
+    Node<K,V>* prev = nullptr;
+    Node<K,V>* p = head_;
 
-    for (auto *p = head_; p != nullptr; p = p->next) {
+    while (p != nullptr) {
         if (KEY(*p) >= key) {
             break;
         }
-        prev_next.first = p;
-        prev_next.second = p->next;
+        prev = p;
+        p = p->next;
     }
 
-    // if mapset is empty then returns {nullptr, nullptr}
-    // if sought node is at end then returns {ptr, nullptr}
-    // if sought node is at begin then returns {nullptr, head_}
-    return prev_next;
+    return {prev, p};
 }
+
 
 /*
 Adds a node to the mapset
@@ -175,10 +177,10 @@ Outputs:
 template<typename K, typename V>
 bool MapSet<K, V>::add(Node<K, V> n) {
     auto prev_next = find_key(KEY(n));
-
-    // if key is in the mapset, then do not add a node
     auto *frwd = prev_next.second;
     auto *back = prev_next.first;
+
+    // if key is in the mapset, then do not add a node
     if (key_at_node(frwd, KEY(n))) {
         return false;
     }
@@ -212,10 +214,10 @@ Outputs:
 template<typename K, typename V>
 bool MapSet<K, V>::remove(K key) {
     auto prev_next = find_key(key);
-
-    // if key is not in the mapset, then do not remove a node
     auto *frwd = prev_next.second;
     auto *back = prev_next.first;
+
+    // if key is not in the mapset, then do not remove a node
     if (!key_at_node(frwd, key)) {
         return false;
     }
@@ -249,9 +251,9 @@ Outputs:
 template<typename K, typename V>
 Node<K, V> MapSet<K, V>::get(K key) {
     auto prev_next = find_key(key);
+    auto *frwd = prev_next.second;
 
     // return an empty node if key is not found
-    auto *frwd = prev_next.second;
     if (!key_at_node(frwd, key)) {
         return Node<K,V>();
     }
@@ -270,9 +272,9 @@ Outputs:
 template<typename K, typename V>
 bool MapSet<K, V>::update(K key, V value) {
     auto prev_next = find_key(key);
+    auto *frwd = prev_next.second;
 
     // if key is not in the mapset, then do not update a node
-    auto *frwd = prev_next.second;
     if (!key_at_node(frwd, key)) {
         return false;
     }

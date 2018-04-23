@@ -1,7 +1,7 @@
 /*
 Bradley Bauer
 Section 14
-04-12-18
+04-23-18
 Project 11
 
 This code implements a mapset by using a linked list and dynamic memory instead of STL vectors.
@@ -143,30 +143,30 @@ size_t MapSet<K, V>::size() const {
 }
 
 /*
-Find the position of the first node whose key is greater than or equal to (not less than) the input key
+Find the position of the first node with key greater than or equal to the input key
 Inputs:
     key: the key to find a position for
 Outputs:
-    prev_next: a pointer to node p and the node that precedes p in the linked list
+    a pointer to node p and a pointer to the node that precedes p
+    if mapset is empty then returns {nullptr, nullptr}
+    if sought node is at beginning then returns {nullptr, head_}
+    if sought node is not found then returns {tail, nullptr}
+    otherwise returns {prev, ptr}
 */
 template<typename K, typename V>
 pair<Node<K,V>*, Node<K,V>*> MapSet<K, V>::find_key(K key) {
-    // A pointer to node p and the node that precedes p in the linked list
-    Node<K, V>* prev = nullptr;
-    Node<K, V>* next = head_;
+    Node<K,V>* prev = nullptr;
+    Node<K,V>* p = head_;
 
-    for (auto *p = head_; p != nullptr; p = p->next) {
+    while (p != nullptr) {
         if (KEY(*p) >= key) {
             break;
         }
         prev = p;
-        next = p->next;
+        p = p->next;
     }
 
-    // if mapset is empty then returns {nullptr, nullptr}
-    // if sought node is at end then returns {ptr, nullptr}
-    // if sought node is at begin then returns {nullptr, head_}
-    return {prev, next};
+    return {prev, p};
 }
 
 /*
