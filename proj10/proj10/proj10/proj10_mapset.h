@@ -12,21 +12,13 @@ This code implements a mapset by using dynamic memory instead of STL vectors.
 
 #include<iostream>
 using std::ostream;
-#include<string>
-using std::string;
-#include<vector>
-using std::vector;
 #include<initializer_list>
 using std::initializer_list;
 #include<algorithm>
-using std::sort; using std::lower_bound;
-using std::copy; using std::swap;
-#include<sstream>
-using std::ostringstream;
+using std::lower_bound;
+using std::copy;
+using std::swap;
 
-//
-// Node
-//
 template<typename K, typename V>
 struct Node {
     K first; // key
@@ -43,9 +35,6 @@ struct Node {
     }
 };
 
-//
-// MapSet
-// 
 template<typename K, typename V>
 class MapSet {
 private:
@@ -54,6 +43,7 @@ private:
     size_t capacity_;
     Node<K, V>* find_key(K);
     void grow();
+
 public:
     MapSet(int sz = 2);
     MapSet(initializer_list< Node<K, V> >);
@@ -97,8 +87,6 @@ public:
 
 /*
 Initialize an empty mapset with sz capacity
-Inputs:
-    sz (int): capacity of the mapset
 */
 template<typename K, typename V>
 MapSet<K, V>::MapSet(int sz) {
@@ -113,8 +101,6 @@ MapSet<K, V>::MapSet(int sz) {
 
 /*
 Initializes the mapset with nodes from an initializer list
-Inputs:
-    il (initializer_list<pr>): an list of nodes to put into the mapset
 */
 template<typename K, typename V>
 MapSet<K, V>::MapSet(initializer_list< Node<K, V> > il) : MapSet(il.size()) {
@@ -125,9 +111,7 @@ MapSet<K, V>::MapSet(initializer_list< Node<K, V> > il) : MapSet(il.size()) {
 }
 
 /*
-Copy contstructs a new mapset
-Inputs:
-    ms (const MapSet &): the mapset to copy
+Construct a new mapset by copy of another mapset
 */
 template<typename K, typename V>
 MapSet<K, V>::MapSet(const MapSet &ms) {
@@ -139,8 +123,6 @@ MapSet<K, V>::MapSet(const MapSet &ms) {
 
 /*
 Assign the input mapset to *this by copy and swap
-Inputs:
-    ms (MapSet): a copy of some mapset
 */
 template<typename K, typename V>
 MapSet<K, V>& MapSet<K, V>::operator=(MapSet<K, V> ms) {
@@ -182,9 +164,9 @@ void MapSet<K, V>::grow() {
 /*
 Find the position of the first node whose key is greater than or equal to (not less than) the input key
 Inputs:
-    key (K): the key to find a position for
+    key: the key to find a position for
 Outputs:
-    (Node<K,V>*): a pointer into the mapset's internal buffer
+    a pointer into the mapset's internal buffer
 */
 template<typename K, typename V>
 Node<K, V>* MapSet<K, V>::find_key(K key) {
@@ -194,9 +176,9 @@ Node<K, V>* MapSet<K, V>::find_key(K key) {
 /*
 Adds a node to the mapset
 Inputs:
-    p (Node): the node to add
+    p: the node to add
 Outputs:
-    (bool): whether a node was added to the mapset
+    whether a node was added to the mapset
 */
 template<typename K, typename V>
 bool MapSet<K, V>::add(Node<K, V> n) {
@@ -210,7 +192,7 @@ bool MapSet<K, V>::add(Node<K, V> n) {
 
     // If there is no more room
     if (capacity_ == last_) {
-        grow();
+        grow(); // grows only if key is found
     }
 
     // Shift each element in range [p, end) to the right by one
@@ -227,9 +209,9 @@ bool MapSet<K, V>::add(Node<K, V> n) {
 /*
 Removes a node from the mapset
 Inputs:
-    key (string): the key of the node to remove
+    key: the key of the node to remove
 Outputs:
-    (bool): whether a node was removed from the mapset
+    whether a node was removed from the mapset
 */
 template<typename K, typename V>
 bool MapSet<K, V>::remove(K key) {
@@ -252,9 +234,9 @@ bool MapSet<K, V>::remove(K key) {
 Return the node with the given key from the mapset
 If the key is not found return an empty node
 Inputs:
-    key (string): the key to lookup in the mapset
+    key: the key to lookup in the mapset
 Outputs:
-    (Node): the node with node.key == key, or an empty node
+    the node with node.key == key, or an empty node
 */
 template<typename K, typename V>
 Node<K, V> MapSet<K, V>::get(K key) {
@@ -271,10 +253,10 @@ Node<K, V> MapSet<K, V>::get(K key) {
 /*
 Set the value of the node with the given key to the given value if the node is found in the mapset
 Inputs:
-    key (string): the key to look for in the mapset
-    val (long): the new value of the node
+    key: the key to look for in the mapset
+    val: the new value of the node
 Outputs:
-    (bool): whether a node with the given key was found in the mapset
+    whether a node with the given key was found in the mapset
 */
 template<typename K, typename V>
 bool MapSet<K, V>::update(K key, V value) {
@@ -295,11 +277,11 @@ bool MapSet<K, V>::update(K key, V value) {
 Compares the calling mapset's keys with the input mapset's keys
 Similar to comparing lists of strings in python
 Inputs:
-    m (MapSet&): the mapset to compare against
+    m: the mapset to compare against
 Outputs:
-    (int): -1 if this.keys() < ms.keys() (or if each key compares equal but v_ has less number of keys)
-            0 if this.keys() = ms.keys() (each have same number of keys and they all compare equal)
-            1 if this.keys() > ms.keys() (or if each key compares equal but m.v_ has less number of keys)
+    -1 if this.keys() < ms.keys() (or if each key compares equal but v_ has less number of keys)
+     0 if this.keys() = ms.keys() (each have same number of keys and they all compare equal)
+     1 if this.keys() > ms.keys() (or if each key compares equal but m.v_ has less number of keys)
 */
 template<typename K, typename V>
 int MapSet<K, V>::compare(MapSet &ms) {
@@ -322,9 +304,9 @@ int MapSet<K, V>::compare(MapSet &ms) {
 /*
 Computes the union of the calling mapset and an input mapset
 Inputs:
-    m (MapSet&): the mapset to combine with the calling mapset
+    m: the mapset to combine with the calling mapset
 Outputs:
-    ms_union (MapSet): the union of the calling mapset and input mapset
+    _union: the union of the calling mapset and input mapset
 */
 template<typename K, typename V>
 MapSet<K, V> MapSet<K, V>::mapset_union(MapSet<K, V> &ms) {
@@ -338,9 +320,9 @@ MapSet<K, V> MapSet<K, V>::mapset_union(MapSet<K, V> &ms) {
 /*
 Computes the intersection of the calling mapset and an input mapset
 Inputs:
-    m (MapSet&): the mapset to intersect with the calling mapset
+    m: the mapset to intersect with the calling mapset
 Outputs:
-    intersection (MapSet): the intersect of the calling mapset and input mapset
+    intersection: the intersection of the calling mapset and input mapset
 */
 template<typename K, typename V>
 MapSet<K, V> MapSet<K, V>::mapset_intersection(MapSet<K, V> &ms) {
