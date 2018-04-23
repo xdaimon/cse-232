@@ -189,11 +189,11 @@ bool MapSet<K, V>::add(Node<K, V> n) {
     // insert between back and frwd
     p->next = frwd;
 
-    // link preceding node to p if it exists
+    // link preceding node to p if preceding node exists
     if (back) {
         back->next = p;
     }
-    else if (frwd == head_) { // if at beginning (or if mapset is empty)
+    else { // else we're at the beginning (or mapset is empty)
         head_ = p;
     }
 
@@ -223,11 +223,11 @@ bool MapSet<K, V>::remove(K key) {
     // and KEY(*frwd) == key
 
 
-    // unlink preceding node from frwd if it exists
+    // link preceding node to frwd->next if preceding node exists
     if (back) {
         back->next = frwd->next;
     }
-    else if (frwd == head_) { // if at beginning (or if mapset is empty)
+    else { // else we're at the beginning
         head_ = frwd->next;
     }
 

@@ -195,7 +195,7 @@ bool MapSet<K, V>::add(Node<K, V> n) {
     if (back) {
         back->next = p;
     }
-    else if (frwd == head_) { // if at beginning (or if mapset is empty)
+    else { // else we're at the beginning (or mapset is empty)
         head_ = p;
     }
 
@@ -227,7 +227,7 @@ bool MapSet<K, V>::remove(K key) {
     if (back) {
         back->next = frwd->next;
     }
-    else if (frwd == head_) { // if at beginning (or if mapset is empty)
+    else { // else we're at the beginning
         head_ = frwd->next;
     }
 
