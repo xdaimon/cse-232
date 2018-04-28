@@ -24,18 +24,18 @@ using std::ostringstream;
 
 template<typename K, typename V>
 struct Node {
-    K first;
-    V second;
+    K key;
+    V val;
     Node *next = nullptr;
 
     Node() = default;
-    Node(K k, V v) : first(k), second(v) {};
+    Node(K k, V v) : key(k), val(v) {};
 
-    bool operator<(const Node& n) const { return first < n.first; }
-    bool operator==(const Node& n) const { return first == n.first; }
+    bool operator<(const Node& n) const { return key < n.key; }
+    bool operator==(const Node& n) const { return key == n.key; }
 
     friend ostream& operator<<(ostream &out, const Node &n) {
-        return out << n.first << ":" << n.second;
+        return out << n.key << ":" << n.val;
     }
 };
 
@@ -76,13 +76,8 @@ class MapSet {
         return out << o.substr(0, o.size() - 2); // ok even if substr(0, size_t(0)-2)
     }
 
-    // Key-value convenience funcs
-    static K KEY(const Node<K, V>& p) { return p.first; }
-    static K& KEY(Node<K, V>& p) { return p.first; }
-    static V& VAL(Node<K, V>& p) { return p.second; }
-
     bool key_at_node(const Node<K, V>* iter, const K &key) {
-        return (iter != nullptr) && (KEY(*iter) == key);
+        return (iter != nullptr) && (iter->key == key);
     }
 };
 
@@ -159,7 +154,7 @@ pair<Node<K,V>*, Node<K,V>*> MapSet<K, V>::find_key(K key) {
     Node<K,V>* p = head_;
 
     while (p != nullptr) {
-        if (KEY(*p) >= key) {
+        if (p->key >= key) {
             break;
         }
         prev = p;
@@ -178,10 +173,10 @@ Outputs:
 */
 template<typename K, typename V>
 bool MapSet<K, V>::add(Node<K, V> n) {
-    auto[back, frwd] = find_key(KEY(n));
+    auto[back, frwd] = find_key(n.key);
 
     // if key is in the mapset, then do not add a node
-    if (key_at_node(frwd, KEY(n))) {
+    if (key_at_node(frwd, n.key)) {
         return false;
     }
 
@@ -220,7 +215,7 @@ bool MapSet<K, V>::remove(K key) {
         return false;
     }
     // frwd != nullptr
-    // and KEY(*frwd) == key
+    // and frwd->key == key
 
 
     // unlink preceding node from frwd if preceding node exists
@@ -275,8 +270,8 @@ bool MapSet<K, V>::update(K key, V value) {
         return false;
     }
 
-    KEY(*frwd) = key;
-    VAL(*frwd) = value;
+    frwd->key = key;
+    frwd->val = value;
 
     return true;
 }
@@ -298,11 +293,11 @@ int MapSet<K, V>::compare(MapSet &ms) {
     auto *msp = ms.head_;
     while (p != nullptr && msp != nullptr) {
         // if ms key is 'smaller'
-        if (KEY(*p) > KEY(*msp)) {
+        if (p->key > msp->key) {
             return 1;
         }
         // if this key is 'smaller'
-        if (KEY(*p) < KEY(*msp)) {
+        if (p->key < msp->key) {
             return -1;
         }
         p = p->next;
@@ -352,7 +347,7 @@ MapSet<K, V> MapSet<K, V>::mapset_intersection(MapSet<K, V> &ms) {
 
     // For each element in ms
     for (auto *p = ms.head_; p != nullptr; p = p->next) {
-        const K& key = KEY(*p);
+        const K& key = p->key;
 
         // if there is a node in *this with key
         auto[back, frwd] = find_key(key);
